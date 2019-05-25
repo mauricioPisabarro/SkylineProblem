@@ -70,22 +70,51 @@ unique_ptr<vector<Building>> loadStrip() {
     return unique_ptr<vector<Building>>(strip);
 }
 
+shared_ptr<Skyline> getNextSkyline(shared_ptr<Skyline>& left, shared_ptr<Skyline>& right,
+        int& leftHeight, int& rightHeight) {
+    int maxHeight;
+    shared_ptr<Skyline> toReturn;
 
-shared_ptr<Skyline> merge(shared_ptr<Skyline>& leftSkyline, shared_ptr<Skyline>& rightSkyline) {
-    shared_ptr<Skyline> left = leftSkyline < rightSkyline ? leftSkyline : rightSkyline;
-    shared_ptr<Skyline> right = leftSkyline < rightSkyline ? rightSkyline : leftSkyline;
+    if(left < right){
+        leftHeight = left->height;
+        maxHeight = max(leftHeight, rightHeight);
 
-    while(left && right){
-        if(left < right) {
+        toReturn = make_shared<Skyline>(left->start, maxHeight);
+        left = left->next;
+    }else{
+        rightHeight = right->height;
+        maxHeight = max(leftHeight, rightHeight);
 
-        }else if(right < left){
-
-        }else {
-
-        }
+        toReturn = make_shared<Skyline>(right->start, maxHeight);
+        right = right->next;
     }
 
-    return NULL;
+    return toReturn;
+}
+
+shared_ptr<Skyline> merge(shared_ptr<Skyline>& leftSkyline, shared_ptr<Skyline>& rightSkyline) {
+    auto left = leftSkyline < rightSkyline ? leftSkyline : rightSkyline;
+    auto right = leftSkyline < rightSkyline ? rightSkyline : leftSkyline;
+
+    int leftHeight = 0;
+    int rightHeight = 0;
+
+    shared_ptr<Skyline> mergedSkylines = getNextSkyline(left, right, leftHeight, rightHeight);
+    shared_ptr<Skyline> whereToInsert = mergedSkylines;
+    while(left && right){
+        whereToInsert->next = getNextSkyline(left, right, leftHeight, rightHeight);
+        whereToInsert = whereToInsert->next;
+    }
+
+    if(left){
+        whereToInsert->next = left;
+    }
+
+    if(right){
+        whereToInsert->next = right;
+    }
+
+    return mergedSkylines;
 }
 
 shared_ptr<Skyline> find_skyline(unique_ptr<vector<Building>>& strip, int from, int to){
