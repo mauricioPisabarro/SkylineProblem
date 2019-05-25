@@ -41,6 +41,12 @@ struct Skyline {
         return height < other->height;
     }
 
+    friend ostream & operator << (ostream &out, const Skyline& skyline){
+        out << "( " << skyline.start << ", " << skyline.height << ") ";
+
+        return out;
+    }
+
     int start;
     int height;
     shared_ptr<Skyline> next;
@@ -141,6 +147,15 @@ void print(unique_ptr<vector<T>>& v){
     }
 }
 
+void print(shared_ptr<Skyline> skyLine) {
+    shared_ptr<Skyline> toPrint = skyLine;
+
+    while (toPrint){
+        cout << toPrint.operator*() << " ";
+        toPrint = toPrint->next;
+    }
+}
+
 int main() {
     int cases = 1;
     //cin >> cases;
@@ -148,10 +163,9 @@ int main() {
     while(cases-- > 0){
         auto strip = loadStrip();
 
-        //shared_ptr<Skyline> skyline = find_skyline(strip, 0, strip->size());
+        shared_ptr<Skyline> skyline = find_skyline(strip, 0, strip->size());
 
-        //print skyline
-        print(strip);
+        print(skyline);
         cout << "\n";
     }
 
