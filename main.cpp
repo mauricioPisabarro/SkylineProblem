@@ -26,7 +26,14 @@ struct Building {
     int height;
 };
 
-vector<Building>* loadStrip() {
+struct Skyline {
+    Skyline(Building b, Skyline* n) : building(b), next(n) {}
+
+    Building building;
+    unique_ptr<Skyline> next;
+};
+
+unique_ptr<vector<Building>> loadStrip() {
     int stripLength;
     cin >> stripLength;
 
@@ -43,12 +50,31 @@ vector<Building>* loadStrip() {
     // IMPORTANT STEP O(log(n)) <<<<<<<<<<<<<<<<<<<<<<<<<<<<===================================
     sort(strip->begin(), strip->end());
 
-    return strip;
+    return unique_ptr<vector<Building>>(strip);
 }
 
-void print(unique_ptr<vector<Building>>& skyline){
-    for(int i = 0; i < skyline->size(); i++){
-        cout << skyline->at(i);
+unique_ptr<Skyline> merge(unique_ptr<Skyline>& left, unique_ptr<Skyline>& right) {
+    return NULL;
+}
+
+unique_ptr<Skyline> find_skyline(unique_ptr<vector<Building>>& strip, int from, int to){
+    if(from == to){
+        return make_unique<Skyline>(strip->at(from), NULL);
+    }
+
+    int middle = (to - from)/2 + from/2; //to avoid overflow
+
+    auto left = find_skyline(strip, from, middle);
+    auto right = find_skyline(strip, middle + 1, to);
+
+    return merge(left, right);
+}
+
+
+template <class T>
+void print(unique_ptr<vector<T>>& v){
+    for(T t : v.operator*()){
+        cout << t;
     }
 }
 
@@ -57,9 +83,9 @@ int main() {
     //cin >> cases;
 
     while(cases-- > 0){
-        auto strip = unique_ptr<vector<Building>>(loadStrip());
+        auto strip = loadStrip();
 
-        //skyline
+        unique_ptr<Skyline> skyline = find_skyline(strip, 0, strip->size());
 
         //print skyline
         print(strip);
