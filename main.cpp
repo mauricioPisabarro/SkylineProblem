@@ -29,7 +29,7 @@ vector<Building> loadStrip() {
     int stripLength;
     cin >> stripLength;
 
-    vector<Building> strip(stripLength);
+    vector<Building> strip;
     while(stripLength > 0){
         int start, end, height;
         cin >> start >> end >> height;
