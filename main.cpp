@@ -1,6 +1,7 @@
 #include <iostream>
 #include <algorithm>
 #include <vector>
+#include <memory>
 
 using namespace std;
 
@@ -25,29 +26,29 @@ struct Building {
     int height;
 };
 
-vector<Building> loadStrip() {
+vector<Building>* loadStrip() {
     int stripLength;
     cin >> stripLength;
 
-    vector<Building> strip;
+    auto strip = new vector<Building>();
     while(stripLength > 0){
         int start, end, height;
         cin >> start >> end >> height;
 
-        strip.push_back(Building(start, end, height));
+        strip->push_back(Building(start, end, height));
 
         stripLength -= STRIP_SIZE;
     }
 
     // IMPORTANT STEP O(log(n)) <<<<<<<<<<<<<<<<<<<<<<<<<<<<===================================
-    sort(strip.begin(), strip.end());
+    sort(strip->begin(), strip->end());
 
     return strip;
 }
 
-void print(vector<Building> skyline){
-    for(int i = 0; i < skyline.size(); i++){
-        cout << skyline[i];
+void print(unique_ptr<vector<Building>>& skyline){
+    for(int i = 0; i < skyline->size(); i++){
+        cout << skyline->at(i);
     }
 }
 
@@ -56,7 +57,7 @@ int main() {
     //cin >> cases;
 
     while(cases-- > 0){
-        vector<Building> strip = loadStrip();
+        auto strip = unique_ptr<vector<Building>>(loadStrip());
 
         //skyline
 
