@@ -1,18 +1,23 @@
 #include <iostream>
-#include <bits/stl_bvector.h>
+#include <algorithm>
+#include <vector>
 
 using namespace std;
 
 const auto STRIP_SIZE = 3;
 
 struct Building {
-public:
+    Building() {}
     Building(int s, int e, int h) : start(s), end(e), height(h) {}
 
     friend ostream & operator << (ostream &out, const Building& strip){
         out << "( " << strip.start << ", " << strip.end << " ," << strip.height << ") ";
 
         return out;
+    }
+
+    bool operator<(const Building& otherBuilding) const {
+        return start < otherBuilding.start;
     }
 
     int start;
@@ -34,8 +39,11 @@ vector<Building> loadStrip() {
         stripLength -= STRIP_SIZE;
     }
 
+    // IMPORTANT STEP O(log(n)) <<<<<<<<<<<<<<<<<<<<<<<<<<<<===================================
+    sort(strip.begin(), strip.end());
+
     return strip;
-};
+}
 
 void print(vector<Building> skyline){
     for(int i = 0; i < skyline.size(); i++){
@@ -44,8 +52,8 @@ void print(vector<Building> skyline){
 }
 
 int main() {
-    int cases;
-    cin >> cases;
+    int cases = 1;
+    //cin >> cases;
 
     while(cases-- > 0){
         vector<Building> strip = loadStrip();
@@ -58,4 +66,4 @@ int main() {
     }
 
     return 0;
-};
+}
