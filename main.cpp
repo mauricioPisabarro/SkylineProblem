@@ -9,6 +9,7 @@ const auto STRIP_SIZE = 3;
 
 struct Building {
     Building() {}
+    Building(const Building& b) : Building(b.start, b.end, b.height) {}
     Building(int s, int e, int h) : start(s), end(e), height(h) {}
 
     friend ostream & operator << (ostream &out, const Building& strip){
@@ -27,17 +28,33 @@ struct Building {
 };
 
 struct Skyline {
-    Skyline(Building b, Skyline* n) : building(b), next(n) {}
+    Skyline() {}
+    Skyline(int s, int h) : start(s), height(h) {}
+    Skyline(const Building& building){
+        start = building.start;
+        height = building.height;
 
-    Building building;
-    unique_ptr<Skyline> next;
+        next = make_shared<Skyline>(building.end, 0);
+    }
+
+    bool operator<(const shared_ptr<Skyline>& other) const {
+        return height < other->height;
+    }
+
+    int start;
+    int height;
+    shared_ptr<Skyline> next;
 };
+
+
+
 
 unique_ptr<vector<Building>> loadStrip() {
     int stripLength;
     cin >> stripLength;
 
     auto strip = new vector<Building>();
+    strip->resize(stripLength); //allocate memory to avoid resizing
     while(stripLength > 0){
         int start, end, height;
         cin >> start >> end >> height;
@@ -53,13 +70,27 @@ unique_ptr<vector<Building>> loadStrip() {
     return unique_ptr<vector<Building>>(strip);
 }
 
-unique_ptr<Skyline> merge(unique_ptr<Skyline>& left, unique_ptr<Skyline>& right) {
+
+shared_ptr<Skyline> merge(shared_ptr<Skyline>& leftSkyline, shared_ptr<Skyline>& rightSkyline) {
+    shared_ptr<Skyline> left = leftSkyline < rightSkyline ? leftSkyline : rightSkyline;
+    shared_ptr<Skyline> right = leftSkyline < rightSkyline ? rightSkyline : leftSkyline;
+
+    while(left && right){
+        if(left < right) {
+
+        }else if(right < left){
+
+        }else {
+
+        }
+    }
+
     return NULL;
 }
 
-unique_ptr<Skyline> find_skyline(unique_ptr<vector<Building>>& strip, int from, int to){
+shared_ptr<Skyline> find_skyline(unique_ptr<vector<Building>>& strip, int from, int to){
     if(from == to){
-        return make_unique<Skyline>(strip->at(from), NULL);
+        return make_shared<Skyline>(strip->at(from));
     }
 
     int middle = (to - from)/2 + from/2; //to avoid overflow
@@ -69,6 +100,9 @@ unique_ptr<Skyline> find_skyline(unique_ptr<vector<Building>>& strip, int from, 
 
     return merge(left, right);
 }
+
+
+
 
 
 template <class T>
@@ -85,7 +119,7 @@ int main() {
     while(cases-- > 0){
         auto strip = loadStrip();
 
-        unique_ptr<Skyline> skyline = find_skyline(strip, 0, strip->size());
+        //shared_ptr<Skyline> skyline = find_skyline(strip, 0, strip->size());
 
         //print skyline
         print(strip);
