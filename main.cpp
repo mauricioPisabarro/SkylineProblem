@@ -97,6 +97,20 @@ shared_ptr<Skyline> getNextSkyline(shared_ptr<Skyline>& left, shared_ptr<Skyline
     return toReturn;
 }
 
+void insert(shared_ptr<Skyline>& nextSkyline, shared_ptr<Skyline>& whereToInsert) {
+    int actualStart = whereToInsert->start;
+    int actualHeight = whereToInsert->height;
+
+    if(actualHeight == nextSkyline->height) {
+        return;
+    }else if(actualStart == nextSkyline->start){
+        whereToInsert->height = max(actualHeight, nextSkyline->height);
+    }else{
+        whereToInsert->next = nextSkyline;
+        whereToInsert = whereToInsert->next;
+    }
+}
+
 shared_ptr<Skyline> merge(shared_ptr<Skyline>& leftSkyline, shared_ptr<Skyline>& rightSkyline) {
     auto left = leftSkyline->start < rightSkyline->start ? leftSkyline : rightSkyline;
     auto right = leftSkyline->start < rightSkyline->start ? rightSkyline : leftSkyline;
@@ -107,16 +121,17 @@ shared_ptr<Skyline> merge(shared_ptr<Skyline>& leftSkyline, shared_ptr<Skyline>&
     shared_ptr<Skyline> mergedSkylines = getNextSkyline(left, right, leftHeight, rightHeight);
     shared_ptr<Skyline> whereToInsert = mergedSkylines;
     while(left && right){
-        whereToInsert->next = getNextSkyline(left, right, leftHeight, rightHeight);
-        whereToInsert = whereToInsert->next;
+        auto nextSkyline = getNextSkyline(left, right, leftHeight, rightHeight);
+
+        insert(nextSkyline, whereToInsert);
     }
 
     if(left){
-        whereToInsert->next = left;
+        insert(left, whereToInsert);
     }
 
     if(right){
-        whereToInsert->next = right;
+        insert(right, whereToInsert);
     }
 
     return mergedSkylines;
