@@ -60,7 +60,6 @@ unique_ptr<vector<Building>> loadStrip() {
     cin >> stripLength;
 
     auto strip = new vector<Building>();
-    strip->resize(stripLength); //allocate memory to avoid resizing
     while(stripLength > 0){
         int start, end, height;
         cin >> start >> end >> height;
@@ -81,7 +80,7 @@ shared_ptr<Skyline> getNextSkyline(shared_ptr<Skyline>& left, shared_ptr<Skyline
     int maxHeight;
     shared_ptr<Skyline> toReturn;
 
-    if(left < right){
+    if(left->start < right->start){
         leftHeight = left->height;
         maxHeight = max(leftHeight, rightHeight);
 
@@ -99,8 +98,8 @@ shared_ptr<Skyline> getNextSkyline(shared_ptr<Skyline>& left, shared_ptr<Skyline
 }
 
 shared_ptr<Skyline> merge(shared_ptr<Skyline>& leftSkyline, shared_ptr<Skyline>& rightSkyline) {
-    auto left = leftSkyline < rightSkyline ? leftSkyline : rightSkyline;
-    auto right = leftSkyline < rightSkyline ? rightSkyline : leftSkyline;
+    auto left = leftSkyline->start < rightSkyline->start ? leftSkyline : rightSkyline;
+    auto right = leftSkyline->start < rightSkyline->start ? rightSkyline : leftSkyline;
 
     int leftHeight = 0;
     int rightHeight = 0;
@@ -128,7 +127,7 @@ shared_ptr<Skyline> find_skyline(unique_ptr<vector<Building>>& strip, int from, 
         return make_shared<Skyline>(strip->at(from));
     }
 
-    int middle = (to - from)/2 + from/2; //to avoid overflow
+    int middle = (to - from)/2 + from; //to avoid overflow
 
     auto left = find_skyline(strip, from, middle);
     auto right = find_skyline(strip, middle + 1, to);
@@ -163,7 +162,7 @@ int main() {
     while(cases-- > 0){
         auto strip = loadStrip();
 
-        shared_ptr<Skyline> skyline = find_skyline(strip, 0, strip->size());
+        shared_ptr<Skyline> skyline = find_skyline(strip, 0, strip->size() - 1);
 
         print(skyline);
         cout << "\n";
