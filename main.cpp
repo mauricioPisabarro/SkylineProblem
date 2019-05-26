@@ -67,7 +67,7 @@ unique_ptr<vector<Building>> loadStrip() {
 
         strip->push_back(Building(start, end, height));
 
-        stripLength -= STRIP_SIZE;
+        stripLength --;
     }
 
     // IMPORTANT STEP O(log(n)) <<<<<<<<<<<<<<<<<<<<<<<<<<<<===================================
